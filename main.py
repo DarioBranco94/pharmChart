@@ -244,7 +244,9 @@ class MainWindow(QMainWindow):
             self.view.page().runJavaScript(script_spegni)
 
         # ✅ Apri il cassetto e illumina lo scomparto corretto
-        script_apri = f'window.apriScomparto({info["cassetto"]}, {info["scomparto"]});'
+        script_apri = (
+            f'window.apriScomparto({info["cassetto"]}, {info["griglia"]}, {info["colonna"]});'
+        )
         self.view.page().runJavaScript(script_apri)
 
         # 🔁 Aggiorna stato cassetto aperto
@@ -269,17 +271,27 @@ class MainWindow(QMainWindow):
                 self.cursor.execute("SELECT id FROM Farmaci WHERE nome = ?", (f,))
                 fid = self.cursor.fetchone()[0]
 
-                cassetto = ((scomparto_id - 1) // 6) + 1
+                cassetto = (scomparto_id - 1) // 24
+                pos = (scomparto_id - 1) % 24
+                griglia = pos // 6
+                colonna = pos % 6
                 scomparto = scomparto_id
                 scomparto_id += 1
 
-                self.cursor.execute("""
+                self.cursor.execute(
+                    """
                     INSERT OR IGNORE INTO Prescrizioni
                     (giro_id, paziente_id, farmaco_id, caricato, somministrato, cassetto, scomparto)
                     VALUES (?, ?, ?, 0, 0, ?, ?)
-                """, (self.giro_id, pid, fid, cassetto, scomparto))
+                """,
+                    (self.giro_id, pid, fid, cassetto, scomparto),
+                )
 
-                self.allocazioni[f] = {"cassetto": cassetto, "scomparto": scomparto}
+                self.allocazioni[f] = {
+                    "cassetto": cassetto,
+                    "griglia": griglia,
+                    "colonna": colonna,
+                }
                 farmaci_giro.append(f)
 
         self.conn.commit()
@@ -292,7 +304,9 @@ class MainWindow(QMainWindow):
         farmaco = self.box_medicinali.currentItem().text()
         if farmaco in self.allocazioni:
             info = self.allocazioni[farmaco]
-            script = f'window.apriScomparto({info["cassetto"]}, {info["scomparto"]});'
+            script = (
+                f'window.apriScomparto({info["cassetto"]}, {info["griglia"]}, {info["colonna"]});'
+            )
             self.view.page().runJavaScript(script)
 
             # ✅ Riattiva il checkbox ogni volta che si seleziona un farmaco
@@ -368,7 +382,9 @@ class MainWindow(QMainWindow):
                 script_spegni = f'window.spegniScompartoAssociato("{self.cassetto_aperto_corrente}");'
                 self.view.page().runJavaScript(script_spegni)
 
-            script_apri = f'window.apriScomparto({info["cassetto"]}, {info["scomparto"]});'
+            script_apri = (
+                f'window.apriScomparto({info["cassetto"]}, {info["griglia"]}, {info["colonna"]});'
+            )
             self.view.page().runJavaScript(script_apri)
             self.cassetto_aperto_corrente = cassetto_target
 
