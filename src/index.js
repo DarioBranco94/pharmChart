@@ -119,9 +119,10 @@ function chiudiCassetto(nomeCassetto) {
 window.chiudiCassetto = chiudiCassetto;
 window.spegniScompartoAssociato = spegniScompartoAssociato;
 
-function illuminaScompartoDaIntervallo(cassetto, min, max) {
-    const index = Math.floor(Math.random() * (max - min + 1)) + min;
-    const scomparto = model.getObjectByName(`Scomparto${index}`);
+// Illumina uno scomparto specifico dato cassetto, griglia e colonna
+function illuminaScomparto(cassettoId, griglia, colonna) {
+    const nome = `Scomparto${cassettoId}x${griglia}x${colonna}`;
+    const scomparto = model.getObjectByName(nome);
 
     if (scomparto) {
         scomparto.traverse(node => {
@@ -131,7 +132,7 @@ function illuminaScompartoDaIntervallo(cassetto, min, max) {
                 node.material.needsUpdate = true;
             }
         });
-        scompartiAttivi.set(cassetto, scomparto); // memorizza il riferimento
+        scompartiAttivi.set(`Cassetto${cassettoId}`, scomparto); // memorizza il riferimento
     }
 }
 function spegniScompartoAssociato(cassetto) {
@@ -148,36 +149,25 @@ function spegniScompartoAssociato(cassetto) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('controls').addEventListener('click', (event) => {
-        if (event.target.tagName === 'BUTTON') {
-            const nomeCassetto = event.target.getAttribute('data-cassetto');
-            apriCassetto(nomeCassetto);
-
-            // Determina intervallo scomparti
-            if (nomeCassetto === "Cassetto1") {
-                illuminaScompartoDaIntervallo("Cassetto1", 1, 6);
-            } else if (nomeCassetto === "Cassetto2") {
-                illuminaScompartoDaIntervallo("Cassetto2", 7, 12);
-            } else if (nomeCassetto === "Cassetto3") {
-                illuminaScompartoDaIntervallo("Cassetto3", 13, 18);
+    const controls = document.getElementById('controls');
+    if (controls) {
+        controls.addEventListener('click', (event) => {
+            if (event.target.tagName === 'BUTTON') {
+                const nomeCassetto = event.target.getAttribute('data-cassetto');
+                const id = parseInt(nomeCassetto.replace('Cassetto', ''));
+                apriScomparto(id, 0, 0); // illumina sempre il primo scomparto
             }
-        }
-    });
+        });
+    }
 });
+
 window.apriCassetto = function (nomeCassetto) {
     apriCassetto(nomeCassetto);
-
-    if (nomeCassetto === "Cassetto1") {
-        illuminaScompartoDaIntervallo("Cassetto1", 1, 6);
-    } else if (nomeCassetto === "Cassetto2") {
-        illuminaScompartoDaIntervallo("Cassetto2", 7, 12);
-    } else if (nomeCassetto === "Cassetto3") {
-        illuminaScompartoDaIntervallo("Cassetto3", 13, 18);
-    }
 };
-window.apriScomparto = function (cassetto, scomparto) {
+
+window.apriScomparto = function (cassetto, griglia, colonna) {
     apriCassetto(`Cassetto${cassetto}`);
-    illuminaScompartoDaIntervallo(`Cassetto${cassetto}`, scomparto, scomparto);
+    illuminaScomparto(cassetto, griglia, colonna);
 };
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
