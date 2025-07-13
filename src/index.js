@@ -46,39 +46,7 @@ loader.load('model5Cassetti.glb', (gltf) => {
     });
     model.position.y += 1; // ⬆️ Alza leggermente il modello
     model.rotation.y = -Math.PI / 2 - Math.PI / 5; // Rotazione di 45 gradi su X (in radianti)
-    const carrello = model.getObjectByName("Cassetto1");
-    const scomparto = model.getObjectByName("Scomparto3");
-    if (scomparto) {
-        scomparto.traverse(node => {
-            if (node.isMesh && node.material) {
-                node.material.color.set(0xFFFFFF);
-                node.material.metalness = 0.0;         // no metallo
-                node.material.roughness = 0;
-                node.material.needsUpdate = true;
-            }
-        });
-    }
-
-
-    const cassetto2 = model.getObjectByName("Cassetto2");
-    if (cassetto2) {
-        const initialX = cassetto2.position.x; // salva la posizione iniziale
-        //set positionx to initialX -0.1
-        cassetto2.position.x = initialX - 0.01;
-    }
-
-    const cassetto3 = model.getObjectByName("Cassetto3");
-    if (cassetto3) {
-        const initialX = cassetto3.position.x; // salva la posizione iniziale
-        //set positionx to initialX -0.1
-        cassetto3.position.x = initialX - 0.01;
-    }
-
-
-
-
     scene.add(model);
-    model.traverse(obj => console.log(obj.name));
 }, undefined, err => console.error('Errore GLB', err));
 
 

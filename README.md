@@ -45,3 +45,28 @@ docker-compose up
 
 This performs `npm run build` inside the container and exposes port `3000` on the host. You can still run `python main.py` locally to access the web component served by Docker.
 
+
+## Cart Edge Services
+
+A sample edge stack using Mosquitto and two lightweight Python services is under `opt/cart-edge/`.
+
+```
+opt/cart-edge/
+├── docker-compose.yml
+├── .env
+├── mosquitto/
+│   ├── mosquitto.conf
+│   ├── bridge.conf
+│   └── pwfile
+├── consumer/
+│   ├── Dockerfile
+│   └── cart_event_consumer.py
+├── sync/
+│   ├── Dockerfile
+│   └── cart_sync_service.py
+├── db/
+│   └── cart.db
+└── schema.sql
+```
+
+`create_db.py` in the same directory initializes `db/cart.db` based on `schema.sql`.

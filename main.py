@@ -421,7 +421,6 @@ class MainWindow(QMainWindow):
             stato = "✅" if i < self.farmaco_corrente_index else "⏳"
             item = QListWidgetItem(f"{stato} {f}")
             self.lista_farmaci_stato.addItem(item)
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
